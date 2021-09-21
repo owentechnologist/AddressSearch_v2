@@ -18,7 +18,8 @@ import json
 # stream data looks like this:
 # {\"key\": \"X:GBG:CITY{groupA}\", \"id\": \"1621833630358-0\", \"value\": {\"requestID\": \"PM_UID4\", \"spellCheckMe\": \"tauranto\"}}
 # A couple of lua scripts to generate bogus city names and trigger this gear could look like this:
-#  EVAL "for index = 1,10000,1 do redis.call('SADD',KEYS[1],(string.char((index%20)+97)) .. 'SomeCity' .. index ) end" 1 s:cityList{groupA}
+
+# EVAL "for index = 1,10000,1 do redis.call('SADD',KEYS[1],(string.char((index%20)+97)) .. string.char(((index+7)%11)+97) .. string.char(((index+3)%11)+97) .. 'SomeCity' .. index ) end" 1 s:cityList{groupA}
 # EVAL "for index = 1,10000,1 do redis.call('XADD',KEYS[2],'*','requestID',index,'spellCheckMe',redis.call('SRANDMEMBER',KEYS[1])) end" 2 s:cityList{groupA} X:GBG:CITY{groupA}
 # to test with the addressSearch Java Program:
 ##  delete one of the Set data structures indicating previously seen city name requests: s:addr:hits:{gS}
@@ -33,7 +34,7 @@ def cleanGarbage(starttime,s1):
   cityName = jsonVersion['value']['spellCheckMe']
   requestID = jsonVersion['value']['requestID']
   execute('XADD', 'X:GEAR_DEDUPER_LOG', '*','RECEIVED--> '+s1+' cityName: '+cityName+' requestID: '+requestID)
-  routingPrefix = cityName[0]+cityName[1]
+  routingPrefix = cityName[0]+cityName[1]+cityName[2]
   if execute('SISMEMBER','s:addr:hits:{'+routingPrefix+'}',cityName) == 0:
     execute('SADD','s:addr:hits:{'+routingPrefix+'}',cityName)
     duration = datetime.datetime.now()-starttime

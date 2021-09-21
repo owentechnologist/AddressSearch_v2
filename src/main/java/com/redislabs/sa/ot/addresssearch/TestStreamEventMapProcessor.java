@@ -38,21 +38,23 @@ public class TestStreamEventMapProcessor implements StreamEventMapProcessor {
         long timestart = System.currentTimeMillis();
         Document addressFound = ((Main)callbackTarget).addrSearch(arg,null,null,null);
         long timeend = System.currentTimeMillis();
-        Jedis jedis = null;
-        try{
-            jedis = JedisConnectionFactory.getInstance().getJedisPool().getResource();
-            HashMap<String,String> map = new HashMap<>();
-            map.put("arg_provided",arg);
-            map.put("score",(""+addressFound.getScore()));
-            map.put("searchTimeDurationMillis",""+(timeend-timestart));
-            map.put("docToString",addressFound.toString());
+        if(!(null==addressFound)) {
+            Jedis jedis = null;
+            try {
+                jedis = JedisConnectionFactory.getInstance().getJedisPool().getResource();
+                HashMap<String, String> map = new HashMap<>();
+                map.put("arg_provided", arg);
+                map.put("score", ("" + addressFound.getScore()));
+                map.put("searchTimeDurationMillis", "" + (timeend - timestart));
+                map.put("docToString", addressFound.toString());
 
-            jedis.xadd("X:searchResults",null,map);
-        }catch(Throwable t){
-            System.out.println("WARNING:");
-            t.printStackTrace();
-        }finally{
-            jedis.close();
+                jedis.xadd("X:searchResults", null, map);
+            } catch (Throwable t) {
+                System.out.println("WARNING:");
+                t.printStackTrace();
+            } finally {
+                jedis.close();
+            }
         }
     }
 

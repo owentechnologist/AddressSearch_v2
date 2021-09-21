@@ -18,7 +18,7 @@ import java.util.Map;
 public class Main {
     static final String XMARK = "XXXXX";
     static final String addrIndex = "IDX:ADDRESSES";
-    static final String DATA_UPDATES_STREAM = "X:FOR_PROCESSING{gS}";
+    static final String DATA_UPDATES_STREAM = "X:FOR_PROCESSING{sgc}";
     static Jedis connection = null;
     static final JedisPool jedisPool = JedisConnectionFactory.getInstance().getJedisPool();
     static Main main = null;
@@ -113,7 +113,7 @@ public class Main {
             // the lua script does.
             // comment out the lua script and use the for loop below it
             // to write hashes to all the shards if you prefer
-            jedis.eval("for index = 1,10000,1 do redis.call('HSET','addr:{gS}:'..index,'city','gSomeCity'..index,'city_as_tag','gSomeCity'..index,'state_or_province','CA','country','USA','zip_codes_or_postal_codes',''.. ((index%500)*10)+(88999)) end" ,1, "s:cityList{gS}" );
+            jedis.eval("for index = 1,10000,1 do redis.call('HSET','addr:{sgc}:'..index,'city',string.char((index%20)+97) .. string.char(((index+7)%11)+97) .. string.char(((index+3)%11)+97) ..'SomeCity'..index,'city_as_tag',string.char((index%20)+97) .. string.char(((index+7)%11)+97) .. string.char(((index+3)%11)+97) .. 'SomeCity'..index,'state_or_province','CA','country','USA','zip_codes_or_postal_codes',''.. ((index%500)*10)+(88999)) end" ,1, "s:cityList{gS}" );
             /*
             This loop will write address hashes to all shards.
             This is because no routing value is provided as part of the keyname

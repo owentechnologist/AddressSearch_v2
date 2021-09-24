@@ -34,16 +34,16 @@ public class TestStreamEventMapProcessor implements StreamEventMapProcessor {
 
     //uses Main's addrSearch to fetch the document for the received Stream event
     // Not sure if we need to store the results anywhere...
-    void doSearch(String arg){
+    void doSearch(String city){
         long timestart = System.currentTimeMillis();
-        Document addressFound = ((Main)callbackTarget).addrSearch(arg,null,null,null);
+        Document addressFound = ((SearchHelper)callbackTarget).addrSearch(city,null,null,null);
         long timeend = System.currentTimeMillis();
         if(!(null==addressFound)) {
             Jedis jedis = null;
             try {
                 jedis = JedisConnectionFactory.getInstance().getJedisPool().getResource();
                 HashMap<String, String> map = new HashMap<>();
-                map.put("arg_provided", arg);
+                map.put("arg_provided", city);
                 map.put("score", ("" + addressFound.getScore()));
                 map.put("searchTimeDurationMillis", "" + (timeend - timestart));
                 map.put("docToString", addressFound.toString());

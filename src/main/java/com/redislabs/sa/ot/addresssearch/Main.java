@@ -40,7 +40,7 @@ public class Main {
     public static void main(String [] args){
         String dataUpdatesStreamTarget = DATA_UPDATES_STREAM;
         if(args.length>0){
-            dataUpdatesStreamTarget = DATA_UPDATES_STREAM_BASE+args[0];
+            dataUpdatesStreamTarget = DATA_UPDATES_STREAM_BASE+args[0]+"}";
         }
         main = new Main();
         System.out.println("cleanupIDX: ");
